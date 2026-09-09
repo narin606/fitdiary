@@ -1,0 +1,8 @@
+import { Router } from "express";
+import { z } from "zod";
+import { db } from "../db.js";
+import { requireUser, type AuthedRequest } from "../middleware/requireUser.js";
+export const diaryRouter=Router(); diaryRouter.use(requireUser);
+diaryRouter.get("/",async(req:AuthedRequest,res)=>{const date=z.string().date().catch(new Date().toISOString().slice(0,10)).parse(req.query.date);const start=new Date(`${date}T00:00:00.000Z`),end=new Date(`${date}T23:59:59.999Z`);const entries=await db.diaryEntry.findMany({where:{userId:req.userId,date:{gte:start,lte:end}},include:{items:true},orderBy:{createdAt:"asc"}});res.json({date,entries})});
+diaryRouter.post("/",async(req:AuthedRequest,res)=>{const body=z.object({date:z.coerce.date(),mealType:z.enum(["BREAKFAST","LUNCH","DINNER","SNACK"]),title:z.string().max(120).optional(),notes:z.string().max(1000).optional(),items:z.array(z.object({foodId:z.string().optional(),name:z.string().min(1),servings:z.number().positive().default(1),servingLabel:z.string().default("serving"),calories:z.number().nonnegative(),proteinG:z.number().nonnegative().default(0),carbsG:z.number().nonnegative().default(0),fatG:z.number().nonnegative().default(0)})).default([])}).parse(req.body);const entry=await db.diaryEntry.create({data:{userId:req.userId!,date:body.date,mealType:body.mealType,title:body.title,notes:body.notes,items:{create:body.items}},include:{items:true}});res.status(201).json({entry})});
+diaryRouter.delete("/:id",async(req:AuthedRequest,res)=>{const result=await db.diaryEntry.deleteMany({where:{id:req.params.id,userId:req.userId}});if(!result.count)return res.status(404).json({error:"Entry not found"});res.status(204).end()});

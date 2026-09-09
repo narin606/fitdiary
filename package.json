@@ -1,0 +1,13 @@
+{
+  "name": "fitdiary",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev:web": "npm run dev -w @fitdiary/web",
+    "dev:api": "npm run dev -w @fitdiary/api",
+    "build": "npm run build -w @fitdiary/web && npm run build -w @fitdiary/api",
+    "db:generate": "npm run db:generate -w @fitdiary/api",
+    "db:migrate": "npm run db:migrate -w @fitdiary/api"
+  },
+  "engines": { "node": ">=20" }
+}

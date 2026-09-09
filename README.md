@@ -21,3 +21,4 @@ The web app defaults to `http://localhost:4000` for the API when `NEXT_PUBLIC_AP
 ## Privacy principle
 
 Uploading a meal photo does **not** send it to an AI provider. Analysis is a separate, explicit action initiated by the user.
+

@@ -1,10 +1,38 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
 
-enum GoalType { LOSE MAINTAIN GAIN }
-enum MealType { BREAKFAST LUNCH DINNER SNACK }
-enum FoodSource { VERIFIED CUSTOM COMMUNITY AI_ESTIMATE }
-enum PhotoAnalysisStatus { NOT_REQUESTED PENDING COMPLETE FAILED }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GoalType {
+  LOSE
+  MAINTAIN
+  GAIN
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+enum FoodSource {
+  VERIFIED
+  CUSTOM
+  COMMUNITY
+  AI_ESTIMATE
+}
+
+enum PhotoAnalysisStatus {
+  NOT_REQUESTED
+  PENDING
+  COMPLETE
+  FAILED
+}
 
 model User {
   id String @id @default(cuid())
@@ -32,6 +60,19 @@ model User {
   weights WeightEntry[]
   waterEntries WaterEntry[]
   exercises ExerciseEntry[]
+  emailVerificationTokens EmailVerificationToken[]
+}
+
+model EmailVerificationToken {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Food {

@@ -7,4 +7,6 @@ coverage
 uploads
 *.log
 .DS_Store
+.hermes/
+.vercel/
 

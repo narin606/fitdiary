@@ -41,3 +41,12 @@
 - Browser gate: no browser automation dependency is installed, so route generation was verified through the production build rather than an interactive browser run.
 - Deployment state: source-only; no infrastructure, secret, provider, database, or production changes were made.
 - Remaining release gate: implement backend password-reset contracts and delivery, add component/browser coverage against a disposable API/database, then connect real email delivery.
+
+## 2026-09-11 — revocable sessions and password recovery
+
+- Replaced cookie JWT authentication with 256-bit opaque random session credentials; only SHA-256 digests are persisted. Login rotates the presented session and creates an expiring record, `/me` requires an unexpired/unrevoked record, and logout revokes it and clears the cookie.
+- Added 15-minute, 256-bit password-reset credentials persisted only as SHA-256 digests. Reset consumption, Argon2id password replacement, and revocation of every user session execute in one transaction with a guarded single-use update; invalid, expired, and replayed credentials share one error.
+- Forgot-password returns one generic `202` response for malformed, unknown, unverified, and eligible identities. The web forgot/reset forms now call typed live API endpoints and enforce the shared 10–128-character password policy.
+- Evidence: Prisma Client generation passed; Prisma schema validation passed; API tests passed 12/12 (including existing registration/verification/login coverage); web tests passed 3/3; complete web/API production build and TypeScript checks passed; `git diff --check` passed.
+- Database gate: no disposable PostgreSQL was available (`docker info` unavailable and no local `psql`), so empty-to-latest migration execution and database-backed replay/concurrency tests remain blocked and are required before release.
+- Delivery gate: no email provider/sender/link-base configuration exists. Reset tokens are therefore created securely but are not yet delivered; no token is logged or returned by HTTP. No production access, deployment, or secrets were used.

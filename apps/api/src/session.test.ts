@@ -1,0 +1,2 @@
+import test from "node:test";import assert from "node:assert/strict";import {createSessionToken,hashSessionToken} from "./session.js";
+test("opaque sessions use random bearer tokens with SHA-256 only at rest",()=>{const a=createSessionToken(),b=createSessionToken();assert.notEqual(a,b);assert.match(a,/^[A-Za-z0-9_-]{43}$/);assert.match(hashSessionToken(a),/^[a-f0-9]{64}$/);assert.notEqual(hashSessionToken(a),a)});

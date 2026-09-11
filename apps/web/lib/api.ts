@@ -15,6 +15,7 @@ export const authApi = {
   login: (username: string, password: string) => api<{ user: User }>("/auth/login", { method: "POST", body: JSON.stringify({ username, password }) }),
   register: (username: string, email: string, password: string) => api<{ message: string }>("/auth/register", { method: "POST", body: JSON.stringify({ username, email, password }) }),
   verifyEmail: (token: string) => api<{ message: string }>("/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) }),
+  forgotPassword: (email: string) => api<{ message: string }>("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+  resetPassword: (token: string, password: string) => api<{ message: string }>("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, password }) }),
   logout: () => api<void>("/auth/logout", { method: "POST" }),
 };
-export const unavailablePasswordMessage = "Password recovery is not available yet. Contact support if you need help accessing your account.";

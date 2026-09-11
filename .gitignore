@@ -6,6 +6,7 @@ dist
 coverage
 uploads
 *.log
+*.tsbuildinfo
 .DS_Store
 .hermes/
 .vercel/

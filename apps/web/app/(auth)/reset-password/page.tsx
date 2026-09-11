@@ -1,0 +1,2 @@
+import Link from "next/link"; import { unavailablePasswordMessage } from "../../../lib/api"; import { AuthCard } from "../../../components/AuthCard";
+export default function Reset(){return <AuthCard title="Choose a new password" subtitle="Secure your FitDiary account."><p className="auth-alert" role="status">{unavailablePasswordMessage}</p><p className="auth-switch"><Link href="/login">Back to login</Link></p></AuthCard>}

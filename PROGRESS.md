@@ -29,4 +29,15 @@
 - Deterministic gates: full web/API production build (including lint and TypeScript validation) passed; `git diff --check` passed.
 - Deployment state: source-only; no database migration, production database access, provider call, or deployment was performed.
 - Blockers: real email delivery needs an explicitly configured provider/sender/link base; atomic persistence still needs disposable-PostgreSQL integration coverage before release.
-- Next step: connect registration to a configured delivery adapter without weakening the generic response, add disposable-database concurrency/replay tests, then build branded register/login/verify screens and protected navigation.
+- Next step: connect registration to a configured delivery adapter without weakening the generic response and add disposable-database concurrency/replay tests.
+
+## 2026-09-11 — frontend authentication surface
+
+- Scope: added a FitDiary-branded responsive shared authentication presentation for login, registration, email verification, forgot-password, and reset-password routes, plus cookie-credentialed typed API calls, session bootstrap/context, protected root behavior, safe post-login return targets, and logout.
+- UX/accessibility: forms expose labels, autocomplete hints, inline validation, invalid-field associations, disabled loading actions, live status/error messages, mobile-specific branding, and reduced-motion treatment.
+- TDD evidence: validation and safe-return tests first failed because the auth helper did not exist, then passed 3/3 after implementation.
+- Contract boundary: password recovery screens accurately state that recovery is unavailable because the API has no reset endpoints; they do not fake a successful request. Existing `/auth` contracts were consumed without backend changes.
+- Deterministic gates: frontend tests passed 3/3, standalone TypeScript check passed, Next production build (including framework lint/type validation and all six routes) passed, and `git diff --check` passed. The build reports only the pre-existing `align-items:end` autoprefixer warning in `globals.css`.
+- Browser gate: no browser automation dependency is installed, so route generation was verified through the production build rather than an interactive browser run.
+- Deployment state: source-only; no infrastructure, secret, provider, database, or production changes were made.
+- Remaining release gate: implement backend password-reset contracts and delivery, add component/browser coverage against a disposable API/database, then connect real email delivery.

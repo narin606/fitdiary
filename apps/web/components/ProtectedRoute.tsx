@@ -1,0 +1,4 @@
+"use client";
+import { usePathname, useRouter } from "next/navigation"; import { useEffect } from "react"; import { useAuth } from "../contexts/AuthContext";
+export function ProtectedRoute({children}:{children:React.ReactNode}){const{user,loading}=useAuth();const router=useRouter();const path=usePathname();useEffect(()=>{if(!loading&&!user)router.replace(`/login?returnTo=${encodeURIComponent(path)}`)},[loading,user,router,path]);if(loading||!user)return <main className="protected-loading" role="status" aria-live="polite">Loading your diary…</main>;return children}
+export function LogoutButton(){const{logout}=useAuth();const router=useRouter();return <button className="logout-button" onClick={async()=>{await logout();router.replace("/login")}}>Log out</button>}

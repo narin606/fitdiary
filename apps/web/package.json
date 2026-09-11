@@ -2,7 +2,7 @@
   "name": "@fitdiary/web",
   "version": "0.1.0",
   "private": true,
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
+  "scripts": { "dev": "next dev", "build": "next build", "start": "next start", "typecheck": "tsc --noEmit", "test": "tsx --test lib/*.test.ts" },
   "dependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",

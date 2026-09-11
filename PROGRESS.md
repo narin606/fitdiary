@@ -19,3 +19,14 @@
 - Deployment state: source-only; the migration was not applied to any database and no deployment was performed.
 - Remaining release gate: email delivery, atomic verification, verified-only login, revocable sessions/logout, password reset, request protections, frontend auth routes, disposable-database integration tests, and deployed desktop/mobile E2E.
 - Next milestone: implement atomic single-use email verification and verified-only login against a disposable PostgreSQL database.
+
+## 2026-09-11 — atomic verification and verified-login gate
+
+- Scope: added a token-hash-only verification endpoint whose token consumption and account verification occur in one database transaction; replay, missing, and expired tokens receive one generic failure. Login now issues its HttpOnly cookie only after both password validation and an email-verification timestamp check.
+- Delivery boundary: added a small injectable verification-delivery contract and test. Registration remains deliberately disconnected from outbound delivery until a provider and public verification-link base are configured; no raw token is logged or returned over HTTP.
+- Reference parity: follows Pocketwise’s generic registration acknowledgement, separate verification step, post-verification login, centered card interaction, and planned mobile behavior. FitDiary intentionally deviates by retaining Argon2id password hashes and HttpOnly Secure SameSite cookies instead of browser-readable bearer-token storage.
+- TDD evidence: the new account-auth and delivery tests first failed with `ERR_MODULE_NOT_FOUND`; after implementation, all API tests passed 7/7.
+- Deterministic gates: full web/API production build (including lint and TypeScript validation) passed; `git diff --check` passed.
+- Deployment state: source-only; no database migration, production database access, provider call, or deployment was performed.
+- Blockers: real email delivery needs an explicitly configured provider/sender/link base; atomic persistence still needs disposable-PostgreSQL integration coverage before release.
+- Next step: connect registration to a configured delivery adapter without weakening the generic response, add disposable-database concurrency/replay tests, then build branded register/login/verify screens and protected navigation.

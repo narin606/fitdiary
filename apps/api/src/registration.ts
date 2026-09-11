@@ -4,6 +4,8 @@ export type RegistrationInput = {
   password: string;
 };
 
+export const REGISTRATION_ACCEPTED = "Please check your inbox for a verification email. If an account can be created with those details, the email will arrive shortly.";
+
 type PendingAccount = {
   username: string;
   email: string;

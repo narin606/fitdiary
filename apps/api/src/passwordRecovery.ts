@@ -8,7 +8,7 @@ export function hashPasswordResetToken(token:string){return createHash("sha256")
 export function isValidPassword(password:string){return password.length>=10&&password.length<=128}
 export async function requestPasswordReset(email:string,deps:{now:()=>Date;findVerifiedUser:(email:string)=>Promise<{id:string}|null>;store:(data:{userId:string;tokenHash:string;expiresAt:Date})=>Promise<void>}){
   const user=await deps.findVerifiedUser(email.trim().toLowerCase());
-  if(user){const token=createPasswordResetToken();await deps.store({userId:user.id,tokenHash:hashPasswordResetToken(token),expiresAt:new Date(deps.now().getTime()+PASSWORD_RESET_TTL_MS)});return {accepted:true as const}}
+  if(user){const token=createPasswordResetToken();await deps.store({userId:user.id,tokenHash:hashPasswordResetToken(token),expiresAt:new Date(deps.now().getTime()+PASSWORD_RESET_TTL_MS)});return {accepted:true as const,resetToken:token}}
   return {accepted:true as const};
 }
 export async function resetPassword(token:string,password:string,deps:{now:()=>Date;hashPassword:(password:string)=>Promise<string>;consumeUpdateAndRevoke:(data:{tokenHash:string;passwordHash:string;now:Date})=>Promise<boolean>}){

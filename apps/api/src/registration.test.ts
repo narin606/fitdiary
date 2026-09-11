@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { registerPendingAccount } from "./registration.js";
+import { REGISTRATION_ACCEPTED, registerPendingAccount } from "./registration.js";
+
+test("registration acknowledgement is friendly and remains generic", () => {
+  assert.equal(REGISTRATION_ACCEPTED, "Please check your inbox for a verification email. If an account can be created with those details, the email will arrive shortly.");
+  assert.doesNotMatch(REGISTRATION_ACCEPTED, /account (exists|was created)|registered successfully/i);
+});
 
 test("registration creates an unverified account and hashed verification token without a session", async () => {
   const writes: unknown[] = [];

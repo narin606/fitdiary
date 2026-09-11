@@ -11,3 +11,5 @@ uploads
 .hermes/
 .vercel/
 
+.vercel
+.env*

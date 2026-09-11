@@ -57,3 +57,11 @@
 - Fix: added root `vercel.json` settings that retain the monorepo root while explicitly building only the `@fitdiary/web` workspace and publishing `apps/web/.next` as a Next.js deployment. The root `npm run build` remains unchanged and continues to be the local full-stack build gate.
 - Verification: frontend tests passed 3/3, standalone frontend TypeScript checking passed, the equivalent workspace-only Next.js production build generated `/`, `/login`, `/register`, `/verify-email`, `/forgot-password`, and `/reset-password`, and `git diff --check` passed.
 - Scope boundary: no API database, infrastructure, Cloudflare configuration, or secrets were changed; the API still requires a separate deployment later.
+
+## 2026-09-11 — production authentication and deployment recovery
+
+- Added real Resend delivery for verification and password-reset links, always targeting the frontend routes `/verify-email?token=` and `/reset-password?token=`. Registration returns the exact generic acknowledgement: “Please check your inbox for a verification email. If an account can be created with those details, the email will arrive shortly.”
+- Added the production-only API Dockerfile/Compose deployment and consolidated the pre-release migrations into one baseline. A disposable dedicated PostgreSQL 16 container applied that baseline empty-to-latest successfully and Prisma reported the schema up to date (15 public tables).
+- Safety gate: the dedicated live FitDiary database contains one user, so it was not reset. No other database was accessed or changed.
+- Changed the public API hostname from the Universal-SSL-incompatible `api.fitdiary.kaehana.com` to `fitdiary-api.kaehana.com`; the frontend remains `https://fitdiary.kaehana.com`.
+- Verification gates passed: API tests 14/14, web tests 3/3, and the complete root production build.

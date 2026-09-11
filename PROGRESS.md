@@ -64,4 +64,5 @@
 - Added the production-only API Dockerfile/Compose deployment and consolidated the pre-release migrations into one baseline. A disposable dedicated PostgreSQL 16 container applied that baseline empty-to-latest successfully and Prisma reported the schema up to date (15 public tables).
 - Safety gate: the dedicated live FitDiary database contains one user, so it was not reset. No other database was accessed or changed.
 - Changed the public API hostname from the Universal-SSL-incompatible `api.fitdiary.kaehana.com` to `fitdiary-api.kaehana.com`; the frontend remains `https://fitdiary.kaehana.com`.
-- Verification gates passed: API tests 14/14, web tests 3/3, and the complete root production build.
+- Verification gates passed: API tests 14/14, web tests 3/3, complete root production build, public health 200, exact-origin CORS preflight 204, invalid verification token controlled 400, existing-identity registration generic 202, and frontend bundle new-host count 2 / old-host count 0.
+- Rebuilt only the `fitdiary-prod` API service; it returned healthy. Resend accepted a controlled delivery to the already-existing owner mailbox with response ID `2c09b404-d629-4d46-ae7a-a1b89a23b184`; no inbox-click E2E is claimed.

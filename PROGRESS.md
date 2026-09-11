@@ -50,3 +50,10 @@
 - Evidence: Prisma Client generation passed; Prisma schema validation passed; API tests passed 12/12 (including existing registration/verification/login coverage); web tests passed 3/3; complete web/API production build and TypeScript checks passed; `git diff --check` passed.
 - Database gate: no disposable PostgreSQL was available (`docker info` unavailable and no local `psql`), so empty-to-latest migration execution and database-backed replay/concurrency tests remain blocked and are required before release.
 - Delivery gate: no email provider/sender/link-base configuration exists. Reset tokens are therefore created securely but are not yet delivered; no token is logged or returned by HTTP. No production access, deployment, or secrets were used.
+
+## 2026-09-11 — frontend Vercel deployment build isolation
+
+- Incident: the frontend-only Vercel project was rooted at the monorepo root and inherited `npm run build`, so its successful Next.js build was followed by the API TypeScript build, which failed in Vercel when Prisma Client was not generated there.
+- Fix: added root `vercel.json` settings that retain the monorepo root while explicitly building only the `@fitdiary/web` workspace and publishing `apps/web/.next` as a Next.js deployment. The root `npm run build` remains unchanged and continues to be the local full-stack build gate.
+- Verification: frontend tests passed 3/3, standalone frontend TypeScript checking passed, the equivalent workspace-only Next.js production build generated `/`, `/login`, `/register`, `/verify-email`, `/forgot-password`, and `/reset-password`, and `git diff --check` passed.
+- Scope boundary: no API database, infrastructure, Cloudflare configuration, or secrets were changed; the API still requires a separate deployment later.

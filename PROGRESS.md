@@ -66,3 +66,9 @@
 - Changed the public API hostname from the Universal-SSL-incompatible `api.fitdiary.kaehana.com` to `fitdiary-api.kaehana.com`; the frontend remains `https://fitdiary.kaehana.com`.
 - Verification gates passed: API tests 14/14, web tests 3/3, complete root production build, public health 200, exact-origin CORS preflight 204, invalid verification token controlled 400, existing-identity registration generic 202, and frontend bundle new-host count 2 / old-host count 0.
 - Rebuilt only the `fitdiary-prod` API service; it returned healthy. Resend accepted a controlled delivery to the already-existing owner mailbox with response ID `2c09b404-d629-4d46-ae7a-a1b89a23b184`; no inbox-click E2E is claimed.
+
+## 2026-09-14 — registration acknowledgement copy
+
+- Changed the generic registration acknowledgement to: “Check your inbox for a verification email. It should arrive shortly.” The response remains identity-neutral and does not disclose whether an account exists or was created.
+- Verification: API tests passed 14/14; API TypeScript build and `git diff --check` passed. The targeted production API image was rebuilt and the FitDiary-only Compose services are healthy; the running API reported its Prisma schema up to date with no pending migrations. Public health returned 200 and credentialed CORS preflight returned 204 for the exact FitDiary frontend origin. The public invalid-payload smoke correctly returned 400 without creating an account or triggering email delivery. The acknowledgement’s exact successful-registration response remains covered by the API test; no new public account/email was created solely to test copy.
+- Source synchronization: committed and pushed as `85f24e7` (`fix(auth): shorten registration acknowledgement`), then fetched and verified local `HEAD` equals `origin/main`.

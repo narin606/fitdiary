@@ -3,7 +3,7 @@ import test from "node:test";
 import { REGISTRATION_ACCEPTED, registerPendingAccount } from "./registration.js";
 
 test("registration acknowledgement is friendly and remains generic", () => {
-  assert.equal(REGISTRATION_ACCEPTED, "Please check your inbox for a verification email. If an account can be created with those details, the email will arrive shortly.");
+  assert.equal(REGISTRATION_ACCEPTED, "Check your inbox for a verification email. It should arrive shortly.");
   assert.doesNotMatch(REGISTRATION_ACCEPTED, /account (exists|was created)|registered successfully/i);
 });
 

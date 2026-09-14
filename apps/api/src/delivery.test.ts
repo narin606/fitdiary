@@ -4,7 +4,7 @@ import { deliverVerification, resendDelivery } from "./delivery.js";
 
 test("verification delivery is an injectable abstraction", async () => {
   const sent: unknown[] = [];
-  await deliverVerification({ email: "alice@example.com", token: "secret" }, { sendVerification: async message => { sent.push(message); } });
+  await deliverVerification({ email: "alice@example.com", token: "secret" }, { sendVerification: async message => { sent.push(message); return {}; } });
   assert.deepEqual(sent, [{ email: "alice@example.com", token: "secret" }]);
 });
 

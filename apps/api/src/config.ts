@@ -12,6 +12,7 @@ const schema = z.object({
   AI_BASE_URL: z.string().url().optional(),
   AI_API_KEY: z.string().optional(),
   AI_VISION_MODEL: z.string().default("gpt-4.1-mini"),
+  UPLOAD_DIR: z.string().default("./uploads"),
 });
 
 export const env = schema.parse(process.env);

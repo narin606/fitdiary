@@ -10,6 +10,7 @@ const waterSchema=dated({amountMl:z.number().int().positive().max(10000)});
 const exerciseSchema=dated({name:z.string().trim().min(1).max(120),durationMinutes:z.number().int().positive().max(1440).optional(),caloriesBurned:z.number().int().nonnegative().max(10000),notes:z.string().trim().max(500).optional()});
 const at=(date:string)=>new Date(`${date}T00:00:00.000Z`);
 const range=(date:string)=>{const {start,end}=dayBounds(date);return {gte:start,lt:end};};
+trackingRouter.get("/weight/history",async(req:AuthedRequest,res)=>{const from=parseDay(req.query.from),to=parseDay(req.query.to);if(from>to)return res.status(400).json({error:"From must not be after to"});const start=new Date(`${from}T00:00:00.000Z`),end=new Date(`${to}T00:00:00.000Z`);end.setUTCDate(end.getUTCDate()+1);if((end.getTime()-start.getTime())/86400000>366)return res.status(400).json({error:"Range cannot exceed 366 days"});const entries=await db.weightEntry.findMany({where:{userId:req.userId,date:{gte:start,lt:end}},orderBy:{date:"asc"}});res.json({from,to,entries})});
 const model=(kind:string)=>kind==="weight"?db.weightEntry:kind==="water"?db.waterEntry:kind==="exercise"?db.exerciseEntry:null;
 const schema=(kind:string)=>kind==="weight"?weightSchema:kind==="water"?waterSchema:kind==="exercise"?exerciseSchema:null;
 for(const kind of ["weight","water","exercise"]){
@@ -24,4 +25,4 @@ trackingRouter.get("/day-summary",async(req:AuthedRequest,res)=>{const date=pars
   db.waterEntry.findMany({where:{userId:req.userId,date:dateRange},orderBy:{date:"asc"}}),
   db.exerciseEntry.findMany({where:{userId:req.userId,date:dateRange},orderBy:{date:"asc"}}),
   db.weightEntry.findMany({where:{userId:req.userId,date:dateRange},orderBy:{date:"asc"}}),
-]);const summary=aggregateDay({date,goals:{calories:user.calorieGoal,proteinG:user.proteinGoal,carbsG:user.carbGoal,fatG:user.fatGoal,waterMl:user.waterGoalMl},diaryEntries,waterEntries,exerciseEntries,weightEntries});res.json({...summary,diaryEntries,waterEntries,exerciseEntries,weightEntries});});
+]);const summary=aggregateDay({date,goals:{calories:user.calorieGoal,proteinG:user.proteinGoal,carbsG:user.carbGoal,fatG:user.fatGoal,waterMl:user.waterGoalMl},diaryEntries,waterEntries,exerciseEntries,weightEntries});const publicDiaryEntries=diaryEntries.map(({photoKey,...entry})=>({...entry,hasPhoto:Boolean(photoKey)}));res.json({...summary,diaryEntries:publicDiaryEntries,waterEntries,exerciseEntries,weightEntries});});

@@ -25,6 +25,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      # Private host-backed photo storage. This is mounted only into the API;
+      # it is never served as a public/static directory.
+      - /data/fitdiary/uploads:/app/uploads:rw
     ports:
       - "127.0.0.1:4000:4000"
     healthcheck:

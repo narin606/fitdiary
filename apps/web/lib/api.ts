@@ -1,8 +1,9 @@
 export type ApiErrorBody = { error?: string; message?: string };
 export class ApiError extends Error { constructor(message: string, readonly status: number) { super(message); } }
-const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+export const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${baseUrl}${path}`, { ...options, credentials: "include", headers: { "Content-Type": "application/json", ...options.headers } });
+  const headers=options.body instanceof FormData?options.headers:{ "Content-Type": "application/json", ...options.headers };
+  const response = await fetch(`${apiBaseUrl}${path}`, { ...options, credentials: "include", headers });
   if (!response.ok) {
     const body = await response.json().catch(() => ({})) as ApiErrorBody;
     throw new ApiError(body.error ?? body.message ?? "Something went wrong. Please try again.", response.status);

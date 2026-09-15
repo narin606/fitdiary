@@ -10,3 +10,5 @@ export type TrackingKind="water"|"weight"|"exercise";
 export const createTrackingEntry=(kind:TrackingKind,body:unknown)=>api<{entry:unknown}>(`/tracking/${kind}`,{method:"POST",body:JSON.stringify(body)});
 export const updateTrackingEntry=(kind:TrackingKind,id:string,body:unknown)=>api<{entry:unknown}>(`/tracking/${kind}/${encodeURIComponent(id)}`,{method:"PUT",body:JSON.stringify(body)});
 export const deleteTrackingEntry=(kind:TrackingKind,id:string)=>api<void>(`/tracking/${kind}/${encodeURIComponent(id)}`,{method:"DELETE"});
+export type WeightEntry={id:string;date:string;weightKg:number;notes?:string|null};
+export const getWeightHistory=(from:string,to:string)=>api<{entries:WeightEntry[]}>(`/tracking/weight/history?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);

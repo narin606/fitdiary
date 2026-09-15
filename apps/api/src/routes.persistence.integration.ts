@@ -69,6 +69,17 @@ test("database-backed routes enforce ownership, UTC day bounds, CRUD, aggregates
   const cleared=await db.diaryEntry.findUniqueOrThrow({where:{id:diaryId}});assert.equal(cleared.photoKey,null);assert.equal(cleared.photoUrl,null);assert.equal(cleared.aiRawEstimate,null);assert.equal(cleared.analysisStatus,"NOT_REQUESTED");
   const reupload=new FormData();reupload.append("photo",new Blob([new Uint8Array([0xff,0xd8,0xff,0xda])],{type:"image/jpeg"}),"replacement.jpg");assert.equal((await multipart(`/diary/${diaryId}/photo`,alice.token,reupload)).status,200);
   assert.equal((await request(`/diary/${diaryId}/photo`,bob.token)).status,404);const ownPhoto=await fetch(`${base}/diary/${diaryId}/photo`,{headers:{cookie:`fitdiary_session=${alice.token}`}});assert.equal(ownPhoto.status,200);assert.equal(ownPhoto.headers.get("cache-control"),"private, no-store");assert.equal(ownPhoto.headers.get("cross-origin-resource-policy"),"cross-origin");assert.deepEqual(new Uint8Array(await ownPhoto.arrayBuffer()),new Uint8Array([0xff,0xd8,0xff,0xda]));
+  const provider="http://127.0.0.1:4402";
+  assert.equal((await (await fetch(`${provider}/count`)).json() as any).count,0,"ordinary diary/photo operations must not invoke AI");
+  assert.equal((await fetch(`${base}/analysis/${diaryId}`,{method:"POST"})).status,401);
+  assert.equal((await post(`/analysis/${diaryId}`,bob.token,{})).status,404);
+  assert.equal((await (await fetch(`${provider}/count`)).json() as any).count,0,"unauthorized requests must not invoke AI");
+  const itemsBefore=await db.diaryItem.findMany({where:{diaryEntryId:diaryId},orderBy:{id:"asc"}});
+  const analyzed=await post(`/analysis/${diaryId}`,alice.token,{});assert.equal(analyzed.status,200);assert.equal(analyzed.body.requiresConfirmation,true);assert.equal(analyzed.body.analysis.description,"Mock meal");
+  let analyzedEntry=await db.diaryEntry.findUniqueOrThrow({where:{id:diaryId}});assert.equal(analyzedEntry.analysisStatus,"COMPLETE");assert.deepEqual(await db.diaryItem.findMany({where:{diaryEntryId:diaryId},orderBy:{id:"asc"}}),itemsBefore,"AI suggestions must never mutate items");
+  await fetch(`${provider}/mode/malformed`);const malformed=await post(`/analysis/${diaryId}`,alice.token,{});assert.equal(malformed.status,502);assert.equal(malformed.body.error,"AI provider returned an invalid analysis");
+  analyzedEntry=await db.diaryEntry.findUniqueOrThrow({where:{id:diaryId}});assert.equal(analyzedEntry.analysisStatus,"FAILED");assert.equal(analyzedEntry.aiRawEstimate,null);
+  await fetch(`${provider}/mode/failure`);assert.equal((await post(`/analysis/${diaryId}`,alice.token,{})).status,502);assert.equal((await db.diaryEntry.findUniqueOrThrow({where:{id:diaryId}})).analysisStatus,"FAILED");assert.deepEqual(await db.diaryItem.findMany({where:{diaryEntryId:diaryId},orderBy:{id:"asc"}}),itemsBefore);
   assert.equal(created.body.entry.items[0].foodId,aliceFood.id);
   assert.equal(created.body.entry.items[0].name,"Alice custom");assert.equal(created.body.entry.items[0].servingLabel,"portion");assert.equal(created.body.entry.items[0].calories,1);assert.equal(created.body.entry.items[0].servings,1.5);
   assert.equal("photoKey" in created.body.entry,false);

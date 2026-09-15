@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FitDiary">
+  <rect width="64" height="64" rx="16" fill="#f36b4f"/>
+  <path d="M32 52a13 13 0 0 1-13-13c0-8 13-27 13-27s13 19 13 27a13 13 0 0 1-13 13z" fill="#ffffff"/>
+</svg>

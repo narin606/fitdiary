@@ -10,7 +10,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
   }
   return response.status === 204 ? undefined as T : response.json() as Promise<T>;
 }
-export type User = { id: string; username: string; email: string; displayName: string | null };
+export type User = { id: string; username: string; email: string; displayName: string | null; units?: string; onboarded?: boolean };
 export const authApi = {
   me: () => api<{ user: User }>("/auth/me"),
   login: (identity: string, password: string) => api<{ user: User }>("/auth/login", { method: "POST", body: JSON.stringify({ identity, password }) }),

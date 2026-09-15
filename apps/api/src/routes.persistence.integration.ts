@@ -117,3 +117,57 @@ test("database-backed routes enforce ownership, UTC day bounds, CRUD, aggregates
   assert.equal((await request(`/diary?date=${day}`,alice.token)).body.entries.length,1);
   for(const kind of Object.keys(ids)) {assert.equal((await del(`/tracking/${kind}/${ids[kind]}`,alice.token)).status,204);assert.equal((await request(`/tracking/${kind}?date=${day}`,alice.token)).body.entries.length,0);}
 });
+
+test("onboarding derives targets on the server, stores answers per account, and starts progress",async()=>{
+  const carol=await identity("integration-carol");
+  const dave=await identity("integration-dave");
+  const answers={goalType:"LOSE",sex:"male",birthDate:"1996-09-15",heightCm:180,weightKg:80,targetWeightKg:74,activityLevel:"active",weeklyRateKg:0.5,units:"metric"};
+
+  assert.equal((await request("/auth/me",carol.token)).body.user.onboarded,false,"a fresh account is not onboarded");
+
+  // The preview computes numbers but must not write anything.
+  const preview=await post("/onboarding/plan",carol.token,answers);
+  assert.equal(preview.status,200);
+  const plan=preview.body.plan;
+  assert.ok(plan.calorieGoal<plan.maintenanceCalories,"a loss goal must sit below maintenance");
+  assert.ok(plan.calorieGoal>=1500,"a male target must stay at or above the floor");
+  assert.ok(Math.abs(plan.proteinGoal*4+plan.carbGoal*4+plan.fatGoal*9-plan.calorieGoal)<=4,"macros must add up to the goal");
+  assert.equal(plan.proteinGoal,144,"protein follows body weight");
+  const untouched=await db.user.findUniqueOrThrow({where:{id:carol.user.id}});
+  assert.equal(untouched.onboardedAt,null);assert.equal(untouched.heightCm,null);assert.equal(untouched.activityLevel,null);
+
+  // Implausible answers fail closed instead of producing a nonsense plan.
+  assert.equal((await post("/onboarding",carol.token,{...answers,heightCm:20})).status,400);
+  assert.equal((await post("/onboarding",carol.token,{...answers,weightKg:5})).status,400);
+  assert.equal((await post("/onboarding",carol.token,{...answers,targetWeightKg:90})).status,400);
+  assert.equal((await post("/onboarding",carol.token,{...answers,birthDate:"2025-01-01"})).status,400);
+
+  // Saving stores the answers and the derived targets.
+  const saved=await post("/onboarding",carol.token,answers);
+  assert.equal(saved.status,200);
+  assert.equal(saved.body.profile.heightCm,180);
+  assert.equal(saved.body.profile.activityLevel,"active");
+  assert.equal(saved.body.profile.targetWeightKg,74);
+  assert.equal(saved.body.profile.calorieGoal,plan.calorieGoal);
+  assert.equal(saved.body.profile.proteinGoal,plan.proteinGoal);
+  const completed=await db.user.findUniqueOrThrow({where:{id:carol.user.id}});
+  assert.ok(completed.onboardedAt,"completing setup is recorded");
+  assert.equal(completed.birthDate?.toISOString(),"1996-09-15T00:00:00.000Z");
+  assert.equal((await request("/auth/me",carol.token)).body.user.onboarded,true);
+
+  // Today's weigh-in is seeded so progress starts from the number they gave.
+  const today=new Date().toISOString().slice(0,10);
+  const weights=await request(`/tracking/weight/history?from=${today}&to=${today}`,carol.token);
+  assert.equal(weights.body.entries.length,1);assert.equal(weights.body.entries[0].weightKg,80);
+
+  // An edited target is kept, and re-running setup does not look like a new signup.
+  const edited=await post("/onboarding",carol.token,{...answers,overrides:{calorieGoal:1800}});
+  assert.equal(edited.body.profile.calorieGoal,1800);
+  assert.equal(edited.body.profile.proteinGoal,plan.proteinGoal,"untouched macros keep the suggested value");
+  assert.equal((await db.user.findUniqueOrThrow({where:{id:carol.user.id}})).onboardedAt?.toISOString(),completed.onboardedAt?.toISOString());
+
+  // Another account is unaffected by any of this.
+  assert.equal((await request("/auth/me",dave.token)).body.user.onboarded,false);
+  assert.equal((await request(`/tracking/weight/history?from=${today}&to=${today}`,dave.token)).body.entries.length,0);
+  assert.equal((await request("/onboarding",dave.token)).body.onboarded,false);
+});

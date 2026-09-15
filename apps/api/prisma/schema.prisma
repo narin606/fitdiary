@@ -52,6 +52,8 @@ model User {
   fatGoal Int @default(65)
   waterGoalMl Int @default(2500)
   units String @default("metric")
+  targetWeightKg Float?
+  onboardedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   diaryEntries DiaryEntry[]

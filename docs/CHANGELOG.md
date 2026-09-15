@@ -26,6 +26,7 @@ Notable changes to FitDiary. Entries describe behavior as it exists in the produ
 - **Food data is taken from the trusted record.** When a diary entry references an existing food, nutrition values are copied server-side from that food, and client-supplied snapshot values are ignored. Only the user's serving amount is accepted from the request.
 - **Food references are checked.** A referenced food must be the user's own custom food or a verified global food; unknown, unverified, and other users' foods are rejected.
 - **Photo replacement and deletion are reliable.** Concurrent photo mutations on the same entry are serialized, interrupted uploads are cleaned up, a failed cleanup restores the previous state instead of losing it, and a deletion that cannot remove the file reports an error rather than silently leaving the record inconsistent.
+- **Meal photos render in the app.** The photo response now permits the web app's origin to embed it. Previously the browser refused the image, so a successfully uploaded meal photo appeared broken; upload and retrieval were working, but the picture was never painted.
 
 ### Security
 

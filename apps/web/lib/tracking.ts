@@ -1,0 +1,12 @@
+import { api } from "./api";
+export type DayTotals={calories:number;proteinG:number;carbsG:number;fatG:number;waterMl:number;exerciseCalories:number;exerciseMinutes:number};
+export type DaySummary={date:string;goals:{calories:number;proteinG:number;carbsG:number;fatG:number;waterMl:number};totals:DayTotals;remainingCalories:number;latestWeight:{id:string;weightKg:number;date:string}|null;diaryEntries:unknown[];waterEntries:unknown[];exerciseEntries:unknown[];weightEntries:unknown[]};
+export const isoDay=(date:Date)=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+export const getDaySummary=(date:string)=>api<DaySummary>(`/tracking/day-summary?date=${encodeURIComponent(date)}`);
+export const createDiaryEntry=(body:unknown)=>api<{entry:unknown}>("/diary",{method:"POST",body:JSON.stringify(body)});
+export const updateDiaryEntry=(id:string,body:unknown)=>api<{entry:unknown}>(`/diary/${encodeURIComponent(id)}`,{method:"PUT",body:JSON.stringify(body)});
+export const deleteDiaryEntry=(id:string)=>api<void>(`/diary/${encodeURIComponent(id)}`,{method:"DELETE"});
+export type TrackingKind="water"|"weight"|"exercise";
+export const createTrackingEntry=(kind:TrackingKind,body:unknown)=>api<{entry:unknown}>(`/tracking/${kind}`,{method:"POST",body:JSON.stringify(body)});
+export const updateTrackingEntry=(kind:TrackingKind,id:string,body:unknown)=>api<{entry:unknown}>(`/tracking/${kind}/${encodeURIComponent(id)}`,{method:"PUT",body:JSON.stringify(body)});
+export const deleteTrackingEntry=(kind:TrackingKind,id:string)=>api<void>(`/tracking/${kind}/${encodeURIComponent(id)}`,{method:"DELETE"});

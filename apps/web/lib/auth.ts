@@ -6,7 +6,7 @@ export function validateLogin(identity: string, password: string): FieldErrors {
   const errors: FieldErrors = {};
   const value = identity.trim();
   if (!usernamePattern.test(value) && !emailPattern.test(value)) errors.identity = "Enter your username or email address.";
-  if (password.length < 10) errors.password = "Password must be at least 10 characters.";
+  if (!password.length) errors.password = "Enter your password.";
   return errors;
 }
 

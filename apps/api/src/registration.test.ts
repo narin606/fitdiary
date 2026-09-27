@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { REGISTRATION_ACCEPTED, preparePendingRegistration } from "./registration.js";
+import { EMAIL_ALREADY_REGISTERED, REGISTRATION_ACCEPTED, preparePendingRegistration } from "./registration.js";
 
 test("registration acknowledgement is friendly and remains generic", () => {
   assert.equal(REGISTRATION_ACCEPTED, "Check your inbox for a verification email. It should arrive shortly.");
   assert.doesNotMatch(REGISTRATION_ACCEPTED, /account (exists|was created)|registered successfully/i);
+});
+
+test("existing email guidance points people to login or password reset", () => {
+  assert.equal(EMAIL_ALREADY_REGISTERED, "This email has already been registered. Log in or reset your password.");
 });
 
 test("registration prepares only an expiring pending record; it does not create an account", async () => {

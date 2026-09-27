@@ -2,6 +2,18 @@
 
 Notable changes to FitDiary. Entries describe behavior as it exists in the product.
 
+## 2026-09-27
+
+### Changed
+
+- **Clear account guidance.** Signing in with an unregistered email now points to registration, while registration with an existing email points to sign-in or password recovery.
+- **Recovery accepts username or email.** Password-reset instructions can be requested with either account identifier.
+
+### Fixed
+
+- **Existing accounts can sign in reliably.** Sign-in now checks the stored password without applying today’s new-account length rule to older accounts, and damaged credential records fail safely instead of interrupting the service.
+- **Password recovery is retry-safe.** A new recovery request replaces older unused links, and a delivery failure no longer leaves behind an unusable reset record.
+
 ## 2026-09-15
 
 ### Added
@@ -33,7 +45,7 @@ Notable changes to FitDiary. Entries describe behavior as it exists in the produ
 ### Security
 
 - **Meal analysis is explicit and optional.** Saving a diary entry or uploading a photo never contacts an AI provider. Analysis begins only after the owner opens the private photo and selects **Analyze with AI**. The provider receives the image only for that request, returned estimates are clearly labeled for review, and suggestions never change diary foods or nutrition automatically. Requests are authenticated, ownership-checked, rate-limited, time-bounded, and rejected safely when provider output is invalid.
-- **Accounts require email verification before they exist.** Registration creates an expiring pending record holding only an Argon2id password hash and a hashed verification token; the account is created when the emailed link is consumed. Registration responses stay generic so account existence is not disclosed, registration is rate limited by source IP, username, and email, and a failed email delivery removes the pending record so an identity cannot be reserved.
+- **Accounts require email verification before they exist.** Registration creates an expiring pending record holding only an Argon2id password hash and a hashed verification token; the account is created when the emailed link is consumed. Registration is rate limited by source IP, username, and email, and a failed email delivery removes the pending record so an identity cannot be reserved.
 - **Sessions are revocable** and password recovery is available. Verification, recovery, and delivery logging never record secrets, passwords, raw tokens, or recipient addresses.
 
 ## Earlier

@@ -1,4 +1,5 @@
 export type LoginAccount = { id: string; passwordHash: string; emailVerifiedAt: Date | null };
+export const EMAIL_NOT_REGISTERED = "This email is not registered yet.";
 
 export async function authenticateVerifiedAccount<T extends LoginAccount>(
   account: T | null | undefined,

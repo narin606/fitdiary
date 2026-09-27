@@ -16,7 +16,7 @@ export const authApi = {
   login: (identity: string, password: string) => api<{ user: User }>("/auth/login", { method: "POST", body: JSON.stringify({ identity, password }) }),
   register: (username: string, email: string, password: string) => api<{ message: string }>("/auth/register", { method: "POST", body: JSON.stringify({ username, email, password }) }),
   verifyEmail: (token: string) => api<{ message: string }>("/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) }),
-  forgotPassword: (email: string) => api<{ message: string }>("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+  forgotPassword: (identity: string) => api<{ message: string }>("/auth/forgot-password", { method: "POST", body: JSON.stringify({ identity }) }),
   resetPassword: (token: string, password: string) => api<{ message: string }>("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, password }) }),
   logout: () => api<void>("/auth/logout", { method: "POST" }),
 };

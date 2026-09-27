@@ -2,6 +2,7 @@ export type RegistrationInput = { username: string; email: string; password: str
 
 export const REGISTRATION_ACCEPTED = "Check your inbox for a verification email. It should arrive shortly.";
 export const REGISTRATION_THROTTLED = "Please try again later.";
+export const EMAIL_ALREADY_REGISTERED = "This email has already been registered. Log in or reset your password.";
 
 export type PendingRegistration = {
   username: string;

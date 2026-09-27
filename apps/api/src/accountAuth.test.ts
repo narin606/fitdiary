@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { authenticateVerifiedAccount, verifyPendingAccount } from "./accountAuth.js";
+import { authenticateVerifiedAccount, EMAIL_NOT_REGISTERED, verifyPendingAccount } from "./accountAuth.js";
 
 test("verification delegates one atomic consume-and-verify operation using only the token hash", async () => {
   const calls: unknown[] = [];
@@ -22,4 +22,8 @@ test("login rejects unverified accounts with the same generic result as bad cred
   assert.equal(await authenticateVerifiedAccount({ id: "u1", passwordHash: "hash", emailVerifiedAt: null }, "password", verify), null);
   assert.equal(await authenticateVerifiedAccount({ id: "u1", passwordHash: "hash", emailVerifiedAt: new Date() }, "password", async () => false), null);
   assert.equal((await authenticateVerifiedAccount({ id: "u1", passwordHash: "hash", emailVerifiedAt: new Date() }, "password", verify))?.id, "u1");
+});
+
+test("an unknown email gets actionable registration guidance", () => {
+  assert.equal(EMAIL_NOT_REGISTERED, "This email is not registered yet.");
 });

@@ -2,13 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { validateLogin, validateRegistration, safeReturnTo } from "./auth.js";
 
-test("login accepts a username or email address and requires a secure password", () => {
-  assert.deepEqual(validateLogin("bad name", "short"), {
+test("login accepts a username or email address, including legacy account passwords", () => {
+  assert.deepEqual(validateLogin("bad name", ""), {
     identity: "Enter your username or email address.",
-    password: "Password must be at least 10 characters.",
+    password: "Enter your password.",
   });
-  assert.deepEqual(validateLogin("valid_user", "long-enough"), {});
-  assert.deepEqual(validateLogin("person@example.com", "long-enough"), {});
+  assert.deepEqual(validateLogin("Brandon_1", "legacy"), {});
+  assert.deepEqual(validateLogin("brandon@example.com", "long-enough-password"), {});
 });
 
 test("registration validates email and matching password", () => {

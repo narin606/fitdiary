@@ -1,4 +1,5 @@
 export type FieldErrors = Partial<Record<"identity" | "username" | "email" | "password" | "confirmPassword", string>>;
+import { isValidPassword } from "./passwordPolicy";
 const usernamePattern = /^[a-zA-Z0-9_]{3,30}$/;
 const emailPattern = /^\S+@\S+\.\S+$/;
 
@@ -14,7 +15,7 @@ export function validateRegistration(username: string, email: string, password: 
   const errors: FieldErrors = {};
   if (!usernamePattern.test(username.trim())) errors.username = "Use 3–30 letters, numbers, or underscores.";
   if (!emailPattern.test(email.trim())) errors.email = "Enter a valid email address.";
-  if (password.length < 10) errors.password = "Password must be at least 10 characters.";
+  if (!isValidPassword(password)) errors.password = "Password must meet all requirements.";
   if (password !== confirmation) errors.confirmPassword = "Passwords do not match.";
   return errors;
 }

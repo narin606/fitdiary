@@ -7,6 +7,13 @@ test("reset tokens are random and only their SHA-256 digest is persisted", async
   assert.notEqual(first,second); assert.match(first,/^[A-Za-z0-9_-]{43}$/);
   assert.match(hashPasswordResetToken(first),/^[a-f0-9]{64}$/); assert.notEqual(hashPasswordResetToken(first),first);
 });
-test("password policy matches the frontend",()=>{assert.equal(isValidPassword("123456789"),false);assert.equal(isValidPassword("1234567890"),true);assert.equal(isValidPassword("x".repeat(129)),false)});
+test("password policy requires eight characters, a letter, a number, and a symbol",()=>{
+  assert.equal(isValidPassword("Ab1!defg"),true);
+  assert.equal(isValidPassword("A1!defg"),false);
+  assert.equal(isValidPassword("12345678!"),false);
+  assert.equal(isValidPassword("abcdefgh!"),false);
+  assert.equal(isValidPassword("Abcdefg1"),false);
+  assert.equal(isValidPassword("Ab1!"+"x".repeat(125)),false);
+});
 test("forgot password always returns generic result and stores only digest for known verified email",async()=>{let stored:any;const result=await requestPasswordReset(" USER@Example.COM ",{now:()=>new Date(0),findVerifiedUser:async email=>email==="user@example.com"?{id:"u"}:null,store:async data=>{stored=data}});assert.equal(result.accepted,true);assert.match(result.resetToken!,/^[A-Za-z0-9_-]{43}$/);assert.equal(stored.userId,"u");assert.match(stored.tokenHash,/^[a-f0-9]{64}$/);assert.notEqual(stored.tokenHash,result.resetToken);assert.equal(stored.expiresAt.getTime(),900000)});
-test("reset delegates an atomic consume, password update, and session revocation",async()=>{let input:any;const ok=await resetPassword("raw","1234567890",{now:()=>new Date(1),hashPassword:async()=>"$argon2id$hash",consumeUpdateAndRevoke:async data=>{input=data;return true}});assert.equal(ok,true);assert.equal(input.tokenHash,hashPasswordResetToken("raw"));assert.equal(input.passwordHash,"$argon2id$hash")});
+test("reset delegates an atomic consume, password update, and session revocation",async()=>{let input:any;const ok=await resetPassword("raw","Ab1!defg",{now:()=>new Date(1),hashPassword:async()=>"$argon2id$hash",consumeUpdateAndRevoke:async data=>{input=data;return true}});assert.equal(ok,true);assert.equal(input.tokenHash,hashPasswordResetToken("raw"));assert.equal(input.passwordHash,"$argon2id$hash")});

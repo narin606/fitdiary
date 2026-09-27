@@ -8,6 +8,7 @@ Notable changes to FitDiary. Entries describe behavior as it exists in the produ
 
 - **Clear account guidance.** Signing in with an unregistered email now points to registration, while registration with an existing email points to sign-in or password recovery.
 - **Recovery accepts username or email.** Password-reset instructions can be requested with either account identifier.
+- **Clear password requirements.** Registration and password reset now show three live checks: at least eight characters, at least one letter, and at least one number plus one symbol. The same rules are enforced by the API.
 
 ### Fixed
 

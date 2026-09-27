@@ -5,7 +5,7 @@ export const PASSWORD_RESET_ACCEPTED="If an eligible account exists, password re
 export const PASSWORD_RESET_INVALID="Invalid or expired password reset link.";
 export function createPasswordResetToken(){return randomBytes(32).toString("base64url")}
 export function hashPasswordResetToken(token:string){return createHash("sha256").update(token).digest("hex")}
-export function isValidPassword(password:string){return password.length>=10&&password.length<=128}
+export function isValidPassword(password:string){return password.length>=8&&password.length<=128&&/[A-Za-z]/.test(password)&&/\d/.test(password)&&/[^A-Za-z0-9]/.test(password)}
 export async function requestPasswordReset(email:string,deps:{now:()=>Date;findVerifiedUser:(email:string)=>Promise<{id:string}|null>;store:(data:{userId:string;tokenHash:string;expiresAt:Date})=>Promise<void>}){
   const user=await deps.findVerifiedUser(email.trim().toLowerCase());
   if(user){const token=createPasswordResetToken();await deps.store({userId:user.id,tokenHash:hashPasswordResetToken(token),expiresAt:new Date(deps.now().getTime()+PASSWORD_RESET_TTL_MS)});return {accepted:true as const,resetToken:token}}

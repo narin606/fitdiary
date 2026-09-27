@@ -12,10 +12,12 @@ test("login accepts a username or email address, including legacy account passwo
 });
 
 test("registration validates email and matching password", () => {
-  assert.deepEqual(validateRegistration("fit_user", "bad", "long-enough", "different!!"), {
+  assert.deepEqual(validateRegistration("fit_user", "bad", "abcdefgh", "different!!"), {
     email: "Enter a valid email address.",
+    password: "Password must meet all requirements.",
     confirmPassword: "Passwords do not match.",
   });
+  assert.deepEqual(validateRegistration("fit_user", "user@example.com", "Ab1!defg", "Ab1!defg"), {});
 });
 
 test("return targets cannot leave FitDiary", () => {

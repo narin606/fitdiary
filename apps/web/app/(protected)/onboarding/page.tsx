@@ -20,6 +20,7 @@ import {
   type Sex,
   type Units,
 } from "../../../lib/onboarding";
+import { editableNumber, numericInputValue } from "../../../lib/numericInput";
 
 type Step = "goal" | "about" | "body" | "activity" | "rate" | "plan";
 
@@ -106,8 +107,8 @@ export default function Onboarding() {
   function advance() {
     if (step === "about" && !answers.birthDate) return setError("Choose your birthdate so we can calculate an accurate goal.");
     if (step === "body") {
-      if (answers.heightCm < 90 || answers.heightCm > 250) return setError("Enter a height between 90 and 250 cm.");
-      if (answers.weightKg < 25 || answers.weightKg > 400) return setError("Enter a weight between 25 and 400 kg.");
+      if (!Number.isFinite(answers.heightCm) || answers.heightCm < 90 || answers.heightCm > 250) return setError("Enter a height between 90 and 250 cm.");
+      if (!Number.isFinite(answers.weightKg) || answers.weightKg < 25 || answers.weightKg > 400) return setError("Enter a weight between 25 and 400 kg.");
     }
     const next = steps[index + 1];
     if (next === "rate" || next === "plan") setPlan(null);
@@ -147,7 +148,7 @@ export default function Onboarding() {
 
   const units: Units = answers.units;
   const weightLabel = weightUnitLabel(units);
-  const displayWeight = Math.round(toDisplayWeight(answers.weightKg, units) * 10) / 10;
+  const displayWeight = Number.isFinite(answers.weightKg) ? Math.round(toDisplayWeight(answers.weightKg, units) * 10) / 10 : Number.NaN;
   const displayTarget = answers.targetWeightKg === undefined ? "" : String(Math.round(toDisplayWeight(answers.targetWeightKg, units) * 10) / 10);
   const { feet, inches } = cmToFeetInches(answers.heightCm);
   const age = answers.birthDate ? Math.floor((Date.now() - new Date(answers.birthDate).getTime()) / 31557600000) : null;
@@ -250,7 +251,7 @@ export default function Onboarding() {
             {units === "metric" ? (
               <label className="wizard-field">
                 <span>Height (cm)</span>
-                <input type="number" inputMode="decimal" min={90} max={250} step="0.5" required value={answers.heightCm} onChange={event => set("heightCm", Number(event.target.value))} />
+                <input type="number" inputMode="decimal" min={90} max={250} step="0.5" required value={numericInputValue(answers.heightCm)} onChange={event => set("heightCm", editableNumber(event.target.value))} />
               </label>
             ) : (
               <div className="wizard-field">
@@ -276,8 +277,8 @@ export default function Onboarding() {
                 max={units === "metric" ? 400 : 880}
                 step="0.1"
                 required
-                value={displayWeight}
-                onChange={event => set("weightKg", toKg(Number(event.target.value), units))}
+                value={numericInputValue(displayWeight)}
+                onChange={event => set("weightKg", event.target.value === "" ? Number.NaN : toKg(Number(event.target.value), units))}
               />
               <small>Recorded as today&apos;s weigh-in.</small>
             </label>

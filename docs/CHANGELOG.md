@@ -2,6 +2,17 @@
 
 Notable changes to FitDiary. Entries describe behavior as it exists in the product.
 
+## 2026-10-01
+
+### Changed
+
+- **Consistent dashboard check-ins.** Water, exercise, and weight cards now share the same labeled layout, spacing, icon treatment, and rounded action-button style on mobile and desktop.
+
+### Fixed
+
+- **Body details are easier to edit.** Height and current-weight fields can now be cleared normally before entering a replacement value instead of immediately restoring zero.
+- **Empty weight summaries read clearly.** The dashboard now shows “No check-in yet” without attaching a kilogram unit to an empty value.
+
 ## 2026-09-27
 
 ### Changed

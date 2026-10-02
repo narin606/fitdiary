@@ -9,5 +9,11 @@
     "db:generate": "npm run db:generate -w @fitdiary/api",
     "db:migrate": "npm run db:migrate -w @fitdiary/api"
   },
-  "engines": { "node": ">=20" }
+  "engines": { "node": ">=20" },
+  "overrides": {
+    "postcss": "8.5.28",
+    "prisma": {
+      "deepmerge-ts": "8.0.0"
+    }
+  }
 }
